@@ -1,0 +1,59 @@
+.datepicker {
+  width: 100%;
+  box-shadow: 0 1px 6px rgba(0,0,0,.25);
+  border-radius: 5px;
+  transition: all 0.2s;
+  transition-timing-function: ease-in;
+  max-height: 0;
+  overflow: hidden;
+}
+
+.datepicker input {
+  width: 100%;
+}
+
+.datepicker .calendar {
+  width: 100%;
+  border-bottom: 1px solid rgba(0,0,0,.25);
+}
+
+.datepicker .calendar .text-box {
+  width: calc(100% / 7);
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.datepicker .calendar .text-box .text {
+  width: 80%;
+  height: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+}
+
+.datepicker .calendar .top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.datepicker .calendar .weeks {
+  display: flex;
+  border-bottom: 1px solid rgba(0,0,0,.25);
+  color: rgba(0,0,0,.65);
+}
+
+.datepicker .time-picker {
+  padding: 6px 0;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+}
+
+.datepicker .time-picker .colon {
+  margin: 0 6px;
+}
