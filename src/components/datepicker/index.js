@@ -86,17 +86,17 @@ const DatePicker = () => {
   }, [value]);
 
   const selectYear = useCallback((e) => {
-    setCurrentYear(e.target.value);
+    setCurrentYear(Number(e.target.value));
   }, []);
   const selectMonth = useCallback((e) => {
-    setCurrentMonth(e.target.value);
+    setCurrentMonth(Number(e.target.value));
   }, []);
   const selectHour = useCallback((e) => {
-    setCurrentHour(e.target.value);
+    setCurrentHour(Number(e.target.value));
     setValue(moment([currentYear, currentMonth, value.date(), e.target.value, currentMinute]));
   }, [currentMinute, currentMonth, currentYear, value]);
   const selectMinute = useCallback((e) => {
-    setCurrentMinute(e.target.value);
+    setCurrentMinute(Number(e.target.value));
     setValue(moment([currentYear, currentMonth, value.date(), currentHour, e.target.value]));
   }, [currentHour, currentMonth, currentYear, value]);
   const nextYear = useCallback((date) => {
@@ -208,7 +208,7 @@ const DatePicker = () => {
                     return (
                       <option
                         key={index}
-                        value={month}
+                        value={index}
                       >
                         {month}
                       </option>
