@@ -101,10 +101,10 @@ const DatePicker = (props) => {
   }, [inputValue]);
 
   const changeValue = useCallback(async (year, month, date, hour, minute) => {
-    const newValue = moment([year, month, date, hour, minute]);
+    const newValue = moment([year, month, date, hour || currentHour, minute || currentMinute]);
     await setValue(newValue);
     setInputValue(newValue.format(format));
-  }, [onChange, value]);
+  }, [onChange, value, currentHour, currentMinute]);
   const selectYear = useCallback((e) => {
     setCurrentYear(Number(e.target.value));
   }, []);
@@ -121,6 +121,9 @@ const DatePicker = (props) => {
   }, [currentHour, currentMonth, currentYear, value]);
   const nextYear = useCallback((date) => {
     setCurrentYear(currentYear + 1);
+
+    console.log('date: ', date);
+    console.log('currentYear: ', currentYear);
     if (date && typeof date === 'number') {
       changeValue(currentYear + 1, 0, date);
     }
