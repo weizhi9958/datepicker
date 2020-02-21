@@ -1,6 +1,6 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import * as moment from 'moment'
+import moment from 'moment'
 import { makeStyles } from '@material-ui/styles';
 import { TextField, Select, IconButton } from '@material-ui/core';
 import { ArrowBack, ChevronLeft, ChevronRight, ArrowForward } from '@material-ui/icons';
