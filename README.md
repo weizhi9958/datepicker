@@ -1,4 +1,4 @@
-[Demo](https://github.com/facebook/create-react-app).
+[Demo](https://weizhi9958.github.io/datepicker).
 
 ## Example
 
