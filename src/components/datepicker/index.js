@@ -1,4 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import * as moment from 'moment'
 import { makeStyles } from '@material-ui/styles';
 import { TextField, Select, IconButton } from '@material-ui/core';
@@ -57,11 +58,20 @@ const daysInMonth = (year) => {
 }
 
 
-const DatePicker = () => {
-  const classes = useStyle(),
+const DatePicker = (props) => {
+  const
+    {
+      title,
+      placeholder,
+      value: propsValue,
+      format,
+      onChange,
+    } = props,
+    classes = useStyle(),
     pickerRef = useRef(null),
     [open, setOpen] = useState(false),
-    [value, setValue] = useState(() => moment()),
+    [value, setValue] = useState((moment.isMoment(propsValue) && propsValue) || moment()),
+    [inputValue, setInputValue] = useState((moment.isMoment(propsValue) && propsValue.format(format)) || ''),
     [currentYear, setCurrentYear] = useState(() => value.year()),
     [currentMonth, setCurrentMonth] = useState(() => value.month()),
     [currentHour, setCurrentHour] = useState(() => value.hour()),
@@ -82,9 +92,19 @@ const DatePicker = () => {
   }, [handleClick]);
 
   useEffect(() => {
-    console.log('value: ', value.format('YYYY/MM/DD'));
-  }, [value]);
+    if (inputValue && !propsValue) {
+      onChange(value, inputValue);
+    }
+    if (inputValue && propsValue && !value.isSame(propsValue)) {
+      onChange(value, inputValue);
+    }
+  }, [inputValue]);
 
+  const changeValue = useCallback(async (year, month, date, hour, minute) => {
+    const newValue = moment([year, month, date, hour, minute]);
+    await setValue(newValue);
+    setInputValue(newValue.format(format));
+  }, [onChange, value]);
   const selectYear = useCallback((e) => {
     setCurrentYear(Number(e.target.value));
   }, []);
@@ -93,22 +113,22 @@ const DatePicker = () => {
   }, []);
   const selectHour = useCallback((e) => {
     setCurrentHour(Number(e.target.value));
-    setValue(moment([currentYear, currentMonth, value.date(), e.target.value, currentMinute]));
+    changeValue(currentYear, currentMonth, value.date(), e.target.value, currentMinute);
   }, [currentMinute, currentMonth, currentYear, value]);
   const selectMinute = useCallback((e) => {
     setCurrentMinute(Number(e.target.value));
-    setValue(moment([currentYear, currentMonth, value.date(), currentHour, e.target.value]));
+    changeValue(currentYear, currentMonth, value.date(), currentHour, e.target.value);
   }, [currentHour, currentMonth, currentYear, value]);
   const nextYear = useCallback((date) => {
     setCurrentYear(currentYear + 1);
     if (date && typeof date === 'number') {
-      setValue(moment([currentYear + 1, 0, date]));
+      changeValue(currentYear + 1, 0, date);
     }
   }, [currentYear]);
   const prevYear = useCallback((date) => {
     setCurrentYear(currentYear - 1);
     if (date && typeof date === 'number') {
-      setValue(moment([currentYear - 1, 11, date]));
+      changeValue(currentYear - 1, 11, date)
     }
   }, [currentYear]);
   const nextMonth = useCallback((date) => {
@@ -118,7 +138,7 @@ const DatePicker = () => {
     } else {
       setCurrentMonth(currentMonth + 1);
       if (date && typeof date === 'number') {
-        setValue(moment([currentYear, currentMonth + 1, date, currentHour, currentMinute]));
+        changeValue(currentYear, currentMonth + 1, date, currentHour, currentMinute);
       }
     }
   }, [currentHour, currentMinute, currentMonth, currentYear, nextYear]);
@@ -129,7 +149,7 @@ const DatePicker = () => {
     } else {
       setCurrentMonth(currentMonth - 1);
       if (date && typeof date === 'number') {
-        setValue(moment([currentYear, currentMonth - 1, date, currentHour, currentMinute]));
+        changeValue(currentYear, currentMonth - 1, date, currentHour, currentMinute);
       }
     }
   }, [currentHour, currentMinute, currentMonth, currentYear, prevYear]);
@@ -141,198 +161,222 @@ const DatePicker = () => {
         preMonth(date)
       }
     } else {
-      setValue(moment([currentYear, currentMonth, date, currentHour, currentMinute]));
+      changeValue(currentYear, currentMonth, date, currentHour, currentMinute);
     }
     setOpen(true);
   }, [currentHour, currentMinute, currentMonth, currentYear, nextMonth, preMonth]);
   return (
-    <div ref={pickerRef} className='picker'>
-      <div onClick={() => setOpen(true)}>
+    <div ref={pickerRef} className='picker pos-rel'>
+      <div
+        className='pos-rel'
+        onClick={() => setOpen(true)}
+      >
         <TextField
           fullWidth
+          label={title}
+          placeholder={placeholder}
           variant='outlined'
-          value={value.format('YYYY/MM/DD HH:mm')}
-          onFocus={() => {
-
-          }}
-          onBlur={() => {
-            // setOpen(false);
-          }}
+          value={inputValue}
         />
       </div>
-      <div style={{ maxHeight: open ? '500px' : '0' }} className='datepicker'>
-        <div className='calendar'>
-          <div className='top'>
-            <div>
-              <IconButton
-                size='small'
-                onClick={prevYear}
-              >
-                <ArrowBack />
-              </IconButton>
-              <IconButton
-                size='small'
-                onClick={preMonth}
-              >
-                <ChevronLeft />
-              </IconButton>
-            </div>
-            <div className='select'>
-              <Select
-                native
-                classes={{ root: classes.selectRoot }}
-                value={currentYear}
-                variant='outlined'
-                onChange={selectYear}
-              >
-                {
-                  allYear.map((year, index) => {
-                    return (
-                      <option
-                        key={index}
-                        value={year}>{year}
-                      </option>
-                    )
-                  })
-                }
-              </Select>
-              <Select
-                native
-                classes={{ root: classes.selectRoot }}
-                value={currentMonth}
-                variant='outlined'
-                onChange={selectMonth}
-              >
-                {
-                  allMonth.map((month, index) => {
-                    return (
-                      <option
-                        key={index}
-                        value={index}
-                      >
-                        {month}
-                      </option>
-                    )
-                  })
-                }
-              </Select>
-            </div>
-            <div>
-              <IconButton
-                size='small'
-                onClick={nextMonth}
-              >
-                <ChevronRight />
-              </IconButton>
-              <IconButton
-                size='small'
-                onClick={nextYear}
-              >
-                <ArrowForward />
-              </IconButton>
-            </div>
-          </div>
-          <div className='weeks'>
-            {
-              allWeek.map((week, index) => {
-                return (
-                  <div key={index} className='text-box'>{week}</div>
-                )
-              })
-            }
-          </div>
-          {
-            weeks.map((week, wIdx) => {
-              return (
-                <div
-                  key={wIdx}
-                  className='dis-flex'
-                >
-                  {
-                    week.map((day, dIdx) => {
-                      let whichMonth = 0
-                      let active = false
-                      if (day > 10 && wIdx < 1) whichMonth = -1
-                      if (day < 20 && wIdx > 3) whichMonth = 1
-                      if (
-                        whichMonth === 0 &&
-                        value.date() === day &&
-                        value.month() === currentMonth &&
-                        value.year() === currentYear
-                      ) active = true
-                      return (
-                        <div
-                          key={dIdx}
-                          style={{
-                            color: whichMonth === 0 ? 'rgba(0,0,0,.65)' : 'rgba(0,0,0,.25)'
-                          }}
-                          className='text-box cur-point'
-                          onClick={() => onPick(day, whichMonth)}
-                        >
-                          <div
-                            style={{
-                              color: active ? 'white' : 'inherit',
-                              backgroundColor: active ? '#108ee9' : ''
-                            }}
-                            className='text'
-                          >
-                            {day}
-                          </div>
-                        </div>
-                      )
-                    })
-                  }
+      {
+        open ?
+          <div style={{ maxHeight: open ? '500px' : '0' }} className='datepicker'>
+            <div className='calendar'>
+              <div className='top'>
+                <div>
+                  <IconButton
+                    size='small'
+                    onClick={prevYear}
+                  >
+                    <ArrowBack />
+                  </IconButton>
+                  <IconButton
+                    size='small'
+                    onClick={preMonth}
+                  >
+                    <ChevronLeft />
+                  </IconButton>
                 </div>
-              )
-            })
-          }
-        </div>
-        <div className='time-picker'>
-          <Select
-            native
-            classes={{ root: classes.selectRoot }}
-            value={currentHour}
-            variant='outlined'
-            onChange={selectHour}
-          >
-            {
-              allHour.map((hour, index) => {
-                return (
-                  <option
-                    key={index}
-                    value={hour}
+                <div className='select'>
+                  <Select
+                    native
+                    classes={{ root: classes.selectRoot }}
+                    value={currentYear}
+                    variant='outlined'
+                    onChange={selectYear}
                   >
-                    {`${hour < 10 ? '0' : ''}${hour}`}
-                  </option>
-                )
-              })
-            }
-          </Select>
-          <div className='colon'>:</div>
-          <Select
-            native
-            classes={{ root: classes.selectRoot }}
-            value={currentMinute}
-            variant='outlined'
-            onChange={selectMinute}
-          >
-            {
-              allMinute.map((minute, index) => {
-                return (
-                  <option
-                    key={index}
-                    value={minute}
+                    {
+                      allYear.map((year, index) => {
+                        return (
+                          <option
+                            key={index}
+                            value={year}>{year}
+                          </option>
+                        )
+                      })
+                    }
+                  </Select>
+                  <Select
+                    native
+                    classes={{ root: classes.selectRoot }}
+                    value={currentMonth}
+                    variant='outlined'
+                    onChange={selectMonth}
                   >
-                    {`${minute < 10 ? '0' : ''}${minute}`}
-                  </option>
-                )
-              })
-            }
-          </Select>
-        </div>
-      </div>
+                    {
+                      allMonth.map((month, index) => {
+                        return (
+                          <option
+                            key={index}
+                            value={index}
+                          >
+                            {month}
+                          </option>
+                        )
+                      })
+                    }
+                  </Select>
+                </div>
+                <div>
+                  <IconButton
+                    size='small'
+                    onClick={nextMonth}
+                  >
+                    <ChevronRight />
+                  </IconButton>
+                  <IconButton
+                    size='small'
+                    onClick={nextYear}
+                  >
+                    <ArrowForward />
+                  </IconButton>
+                </div>
+              </div>
+              <div className='weeks'>
+                {
+                  allWeek.map((week, index) => {
+                    return (
+                      <div key={index} className='text-box'>{week}</div>
+                    )
+                  })
+                }
+              </div>
+              {
+                weeks.map((week, wIdx) => {
+                  return (
+                    <div
+                      key={wIdx}
+                      className='dis-flex'
+                    >
+                      {
+                        week.map((day, dIdx) => {
+                          let whichMonth = 0
+                          let active = false
+                          if (day > 10 && wIdx < 1) whichMonth = -1
+                          if (day < 20 && wIdx > 3) whichMonth = 1
+                          if (
+                            whichMonth === 0 &&
+                            value.date() === day &&
+                            value.month() === currentMonth &&
+                            value.year() === currentYear
+                          ) active = true
+                          return (
+                            <div
+                              key={dIdx}
+                              style={{
+                                color: whichMonth === 0 ? 'rgba(0,0,0,.65)' : 'rgba(0,0,0,.25)'
+                              }}
+                              className='text-box cur-point'
+                              onClick={() => onPick(day, whichMonth)}
+                            >
+                              <div
+                                style={{
+                                  color: active ? 'white' : 'inherit',
+                                  backgroundColor: active ? '#108ee9' : ''
+                                }}
+                                className='text'
+                              >
+                                {day}
+                              </div>
+                            </div>
+                          )
+                        })
+                      }
+                    </div>
+                  )
+                })
+              }
+            </div>
+            <div className='time-picker'>
+              <Select
+                native
+                classes={{ root: classes.selectRoot }}
+                value={currentHour}
+                variant='outlined'
+                onChange={selectHour}
+              >
+                {
+                  allHour.map((hour, index) => {
+                    return (
+                      <option
+                        key={index}
+                        value={hour}
+                      >
+                        {`${hour < 10 ? '0' : ''}${hour}`}
+                      </option>
+                    )
+                  })
+                }
+              </Select>
+              <div className='colon'>:</div>
+              <Select
+                native
+                classes={{ root: classes.selectRoot }}
+                value={currentMinute}
+                variant='outlined'
+                onChange={selectMinute}
+              >
+                {
+                  allMinute.map((minute, index) => {
+                    return (
+                      <option
+                        key={index}
+                        value={minute}
+                      >
+                        {`${minute < 10 ? '0' : ''}${minute}`}
+                      </option>
+                    )
+                  })
+                }
+              </Select>
+            </div>
+          </div>
+          : null
+      }
+
     </div>
   )
+}
+
+DatePicker.propTypes = {
+  title: PropTypes.string,
+  format: PropTypes.string,
+  placeholder: PropTypes.string,
+  value: (props, propName, componentName) => {
+    if (props[propName] && !moment.isMoment(props[propName])) {
+      return new Error(`${propName} props需要 moment()實例`)
+    }
+  },
+  onChange: PropTypes.func,
+}
+
+DatePicker.defaultProps = {
+  title: '',
+  format: 'YYYY/MM/DD HH:mm',
+  placeholder: '',
+  value: null,
+  onChange: () => {},
 }
 
 export default DatePicker;

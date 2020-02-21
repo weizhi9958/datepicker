@@ -16,6 +16,9 @@ code {
     monospace;
 }
 
+.pos-rel {
+  position: relative;
+}
 
 .dis-flex {
   display: flex;
