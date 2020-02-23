@@ -171,6 +171,7 @@ const DatePicker = (props) => {
   return (
     <div ref={pickerRef} className='picker pos-rel'>
       <div
+        data-testid='textField'
         className='pos-rel'
         onClick={() => setOpen(true)}
       >
@@ -184,7 +185,11 @@ const DatePicker = (props) => {
       </div>
       {
         open ?
-          <div style={{ maxHeight: open ? '500px' : '0' }} className='datepicker'>
+          <div
+            data-testid="datepicker"
+            style={{ maxHeight: open ? '500px' : '0' }}
+            className='datepicker'
+          >
             <div className='calendar'>
               <div className='top'>
                 <div>
@@ -203,6 +208,7 @@ const DatePicker = (props) => {
                 </div>
                 <div className='select'>
                   <Select
+                    data-testid='select-year'
                     native
                     classes={{ root: classes.selectRoot }}
                     value={currentYear}
@@ -379,7 +385,7 @@ DatePicker.defaultProps = {
   format: 'YYYY/MM/DD HH:mm',
   placeholder: '',
   value: null,
-  onChange: () => {},
+  onChange: () => { },
 }
 
 export default DatePicker;
