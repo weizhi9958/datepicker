@@ -227,6 +227,7 @@ const DatePicker = (props) => {
                     }
                   </Select>
                   <Select
+                    data-testid='select-month'
                     native
                     classes={{ root: classes.selectRoot }}
                     value={currentMonth}
@@ -271,54 +272,58 @@ const DatePicker = (props) => {
                   })
                 }
               </div>
-              {
-                weeks.map((week, wIdx) => {
-                  return (
-                    <div
-                      key={wIdx}
-                      className='dis-flex'
-                    >
-                      {
-                        week.map((day, dIdx) => {
-                          let whichMonth = 0
-                          let active = false
-                          if (day > 10 && wIdx < 1) whichMonth = -1
-                          if (day < 20 && wIdx > 3) whichMonth = 1
-                          if (
-                            whichMonth === 0 &&
-                            value.date() === day &&
-                            value.month() === currentMonth &&
-                            value.year() === currentYear
-                          ) active = true
-                          return (
-                            <div
-                              key={dIdx}
-                              style={{
-                                color: whichMonth === 0 ? 'rgba(0,0,0,.65)' : 'rgba(0,0,0,.25)'
-                              }}
-                              className='text-box cur-point'
-                              onClick={() => onPick(day, whichMonth)}
-                            >
+              <div className='dates'>
+                {
+                  weeks.map((week, wIdx) => {
+                    return (
+                      <div
+                        key={wIdx}
+                        className='dis-flex'
+                      >
+                        {
+                          week.map((day, dIdx) => {
+                            let whichMonth = 0
+                            let active = false
+                            if (day > 10 && wIdx < 1) whichMonth = -1
+                            if (day < 20 && wIdx > 3) whichMonth = 1
+                            if (
+                              whichMonth === 0 &&
+                              value.date() === day &&
+                              value.month() === currentMonth &&
+                              value.year() === currentYear
+                            ) active = true
+                            return (
                               <div
+                                data-testid={`whichMonth${whichMonth}`}
+                                key={dIdx}
                                 style={{
-                                  color: active ? 'white' : 'inherit',
-                                  backgroundColor: active ? '#108ee9' : ''
+                                  color: whichMonth === 0 ? 'rgba(0,0,0,.65)' : 'rgba(0,0,0,.25)'
                                 }}
-                                className='text'
+                                className='text-box cur-point'
+                                onClick={() => onPick(day, whichMonth)}
                               >
-                                {day}
+                                <div
+                                  style={{
+                                    color: active ? 'white' : 'inherit',
+                                    backgroundColor: active ? '#108ee9' : ''
+                                  }}
+                                  className='text'
+                                >
+                                  {day}
+                                </div>
                               </div>
-                            </div>
-                          )
-                        })
-                      }
-                    </div>
-                  )
-                })
-              }
+                            )
+                          })
+                        }
+                      </div>
+                    )
+                  })
+                }
+              </div>
             </div>
             <div className='time-picker'>
               <Select
+                data-testid='select-hour'
                 native
                 classes={{ root: classes.selectRoot }}
                 value={currentHour}
@@ -340,6 +345,7 @@ const DatePicker = (props) => {
               </Select>
               <div className='colon'>:</div>
               <Select
+                data-testid='select-minute'
                 native
                 classes={{ root: classes.selectRoot }}
                 value={currentMinute}
