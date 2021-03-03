@@ -32,7 +32,7 @@ for (let i = 0; i < 60; i++) {
 const daysInMonth = (year) => {
   if (cache[year]) return cache[year]
   const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-  if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) days[1] = 29
+  days[1] = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28
 
   const daysOfYear = days.map((number, index) => {
     let pre = days[index - 1]
